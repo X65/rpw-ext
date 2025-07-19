@@ -560,7 +560,11 @@ export class LspServer {
 
         // *** as LspProject is just a simple cast, not C# cast ***
         const project = sourceFile.project as LspProject
-        if (project && project.isTemporary) {
+        if (project && project.isTemporary
+          && project.modules.some((module) => (
+            filePath == project.srcDir + module.srcPath + "/" + module.srcName
+          ))
+        ) {
           this.removeDiagnostics(sourceFile)
 
           const index = this.projects.indexOf(project)
