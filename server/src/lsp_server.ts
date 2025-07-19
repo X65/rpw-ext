@@ -523,7 +523,11 @@ export class LspServer {
       let sourceFile = this.findSourceFile(filePath)
       if (sourceFile) {
         const project = sourceFile.project as LspProject
-        if (project && project.isTemporary) {
+        if (project && project.isTemporary
+          && project.modules.some((module) => (
+            filePath == project.srcDir + module.srcPath + "/" + module.srcName
+          ))
+        ) {
           this.removeDiagnostics(sourceFile)
           const index = this.projects.indexOf(project)
           this.projects.splice(index, 1)
