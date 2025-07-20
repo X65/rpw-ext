@@ -28,7 +28,7 @@
       "include": "#mnemonics-6502"
     },
     {
-      "include": "#mnemonics-65C02"
+      "include": "#mnemonics-65c02"
     },
     {
       "include": "#mnemonics-65816"
