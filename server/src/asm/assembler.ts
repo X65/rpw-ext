@@ -1,7 +1,7 @@
 
 import * as fs from 'fs'
 import { Module, SourceFile, LineRecord, SymbolMap } from "./project"
-import { Statement, ConditionalStatement, EquStatement, GenericStatement } from "./statements"
+import { Statement, ConditionalStatement, EquStatement, GenericStatement, ImportExportStatement } from "./statements"
 import { TypeDefBeginStatement, DefineDefStatement, MacroInvokeStatement } from "./statements"
 import { ClosingBraceStatement } from "./statements"
 import { Syntax, SyntaxDef } from "./syntaxes/syntax_types"
@@ -736,6 +736,23 @@ export class Assembler {
 
       // definitions always have symbol created
       symExp.symbol = symExp.symbol!
+
+      // mark import/export status
+      this.module.sourceFiles.forEach((sourceFile) => {
+        sourceFile.statements.forEach((statement) => {
+          if (statement instanceof ImportExportStatement) {
+            statement.args.forEach((argSymbol) => {
+              if (argSymbol instanceof SymbolExpression && argSymbol.fullName === symExp.fullName) {
+                if (statement.isExport) {
+                  symExp.setIsExport()
+                } else {
+                  symExp.setIsImport()
+                }
+              }
+            })
+          }
+        })
+      })
 
       const foundSym = this.module.symbolMap.get(symExp.fullName)
 
