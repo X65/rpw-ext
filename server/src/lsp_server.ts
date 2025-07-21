@@ -9,7 +9,7 @@ import { RpwProject, RpwSettings } from "./shared/rpw_types"
 import { Project, Module, SourceFile } from "./asm/project"
 import { Node, NodeErrorType, Token, TokenType } from "./asm/tokenizer"
 import { Expression, FileNameExpression, SymbolExpression, NumberExpression } from "./asm/expressions"
-import { Statement, OpStatement, ImportExportStatement } from "./asm/statements"
+import { Statement, OpStatement, ImportExportStatement, IncludeStatement } from "./asm/statements"
 import { SymbolType } from "./asm/symbols"
 import { renumberLocals, renameSymbol } from "./asm/labels"
 import { Completions, getCommentHeader } from "./lsp_utils"
@@ -1081,8 +1081,39 @@ export class LspServer {
 
     const statement = this.getStatement(params.textDocument.uri, params.position.line)
     if (statement) {
+      if (statement instanceof IncludeStatement) {
+        const fileName = statement.fileNameStr
+        if (fileName) for (const project of this.projects) {
+          const currentFile = this.getSourceFile(params.textDocument.uri)
+          let sourceFile: SourceFile | undefined = undefined
+          for (const module of project.modules) {
+            sourceFile = module.openSourceFile(fileName, currentFile)
+            if (sourceFile) break
+          }
+          if (sourceFile) {
+            const range: lsp.Range = {
+              start: { line: 0, character: 0 },
+              end: { line: 0, character: 0 }
+            }
+            const targetLink: lsp.DefinitionLink = {
+              targetUri: URI.file(sourceFile.fullPath).toString(),
+              targetRange: range,
+              targetSelectionRange: range
+            }
+            const fileExp = statement.args[0]
+            if (fileExp && fileExp instanceof FileNameExpression) {
+              const range = fileExp.getRange()
+              targetLink.originSelectionRange = {
+                start: { line: params.position.line, character: range?.start || 0},
+                end: { line: params.position.line, character: range?.end || 0 }
+              }
+            }
+            return [ targetLink ]
+          }
+        }
+      }
+
       const res = statement.findExpressionAt(params.position.character)
-      // TODO: support include/PUT files
       if (res && res.expression instanceof SymbolExpression) {
         const symExp = res.expression
         let symbol = symExp.symbol

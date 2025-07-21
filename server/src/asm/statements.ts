@@ -1771,7 +1771,7 @@ function scanHex(hexString: string, buffer: number[]) {
 class FileStatement extends Statement {
 
   protected fileName?: exp.FileNameExpression
-  protected fileNameStr: string = ""
+  public fileNameStr: string = ""
 
   postParse(parser: Parser) {
     this.fileName = this.findArg("filename")
