@@ -1692,7 +1692,7 @@ class FileStatement extends Statement {
     this.fileName = this.findArg("filename")
   }
 
-  protected cleanFileName(): string | undefined {
+  public cleanFileName(): string | undefined {
     if (this.fileName) {
       let fileNameStr = this.fileName.getString() || ""
       if (fileNameStr.length > 0) {
