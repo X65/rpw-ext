@@ -2774,8 +2774,8 @@ export class ExternStatement extends Statement {
 
 export class ImportExportStatement extends Statement {
 
-  private isExport: boolean
-  private isZpage: boolean
+  public isExport: boolean
+  public isZpage: boolean
 
   constructor(isExport: boolean, isZpage: boolean) {
     super()
