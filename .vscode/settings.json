@@ -2,7 +2,5 @@
 	"editor.tabSize": 2,
 	"editor.insertSpaces": true,
 	"typescript.preferences.quoteStyle": "double",
-	"workbench.colorCustomizations": {
-		"editor.background": "#000000"
-	}
+	"debug.onTaskErrors": "debugAnyway"
 }
